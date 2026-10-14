@@ -1,0 +1,43 @@
+Dungeon Escape
+License notice
+
+Copyright © 2026 Arcashaft
+
+Dungeon Escape is a collection of original content created by Arcashaft and
+third-party software and media distributed under their respective licenses.
+There is therefore no single license that applies to the complete contents of
+this repository.
+
+ORIGINAL CONTENT BY ARCASHAFT
+
+Code:
+- chat_blocker — GNU General Public License v3.0 (GPLv3)
+- dungeon_checkpoint — GNU General Public License v3.0 (GPLv3)
+- dungeon_core — GNU General Public License v3.0 (GPLv3)
+- dungeon_mechanics — GNU General Public License v3.0 (GPLv3)
+- custom_pointer — MIT License
+- unwalkable_carpets — MIT License
+
+Original media:
+- custom_pointer images — CC0 1.0 Universal
+- Dungeon Escape dungeon/map design created by Arcashaft — CC BY-SA 4.0
+
+The complete license texts for the original code are included in the
+corresponding mod directories. The dungeon map and other original media may
+have separate licensing from the code that uses them.
+
+THIRD-PARTY CONTENT
+
+All third-party mods, libraries, textures, sounds, fonts and other assets
+included in Dungeon Escape remain under their original licenses. Their
+copyright notices and license files must be preserved. See LICENSES.md for the
+attribution and license summary.
+
+Nothing in this file grants any rights to third-party content beyond those
+granted by the respective original licenses.
+
+The GNU GPLv3, MIT and Creative Commons license texts can be found at:
+- https://www.gnu.org/licenses/gpl-3.0.html
+- https://opensource.org/license/mit
+- https://creativecommons.org/publicdomain/zero/1.0/
+- https://creativecommons.org/licenses/by-sa/4.0/

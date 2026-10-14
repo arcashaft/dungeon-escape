@@ -1,0 +1,6 @@
+[Dungeon Escape]
+
+# Normal: standard Dungeon Escape experience.
+# Hardcore: a more demanding survival experience.
+# Permadeath: extreme mode; dying ends the game.
+dungeon_mode (Game mode) enum Normal Normal,Hardcore,Permadeath
