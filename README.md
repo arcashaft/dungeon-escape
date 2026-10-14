@@ -1,3 +1,6 @@
+![](menu/icon.png)
+![](menu/header.png)
+
 # Dungeon Escape
 
 Dungeon Escape is an escape room and exploration experience set in a dark, eerie dungeon.
