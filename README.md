@@ -1,7 +1,6 @@
-![](menu/icon.png)
-![](menu/header.png)
-
 # Dungeon Escape
+
+![Dungeon Escape](menu/header.png)
 
 Dungeon Escape is an escape room and exploration experience set in a dark, eerie dungeon.
 Explore its rooms, solve puzzles, overcome traps, and figure out how to progress while the environment itself tries to deceive you.
