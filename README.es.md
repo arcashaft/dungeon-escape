@@ -1,5 +1,7 @@
 # Dungeon Escape
 
+![Dungeon Escape](menu/header.png)
+
 Dungeon Escape es una experiencia de _escape room_ y exploración ambientada en una tenebrosa mazmorra.
 Explora sus salas, resuelve acertijos, supera trampas y descubre cómo avanzar mientras el propio entorno intenta engañarte.
 La mazmorra es un mundo prefabricado y diseñado para ofrecer una experiencia fija: cada partida transcurre en el mismo complejo de salas y desafíos.
