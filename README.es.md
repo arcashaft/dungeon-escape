@@ -92,4 +92,4 @@ Puedes comunicarlo mediante los problemas del repositorio de GitHub.
 
 ## Repositorio
 
-[GitHub](AQUÍ_PONDREMOS_LA_URL)
+[GitHub](https://github.com/arcashaft/dungeon-escape.git)
