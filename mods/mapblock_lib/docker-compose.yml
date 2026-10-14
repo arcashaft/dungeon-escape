@@ -1,0 +1,16 @@
+
+services:
+  mtt:
+    image: ghcr.io/buckaroobanzay/mtt:latest
+    volumes:
+     - "./:/github/workspace"
+    environment:
+     INPUT_MODNAME: "mapblock_lib"
+     INPUT_TEST_MODE: "mod"
+     INPUT_MAPGEN: "v7"
+     INPUT_GIT_GAME_REPO: "https://github.com/minetest/minetest_game"
+     INPUT_GIT_DEPENDENCIES: |
+      https://github.com/BuckarooBanzay/mtzip
+      https://github.com/BuckarooBanzay/isogen
+      https://github.com/BuckarooBanzay/placeholder
+      https://github.com/mt-mods/promise

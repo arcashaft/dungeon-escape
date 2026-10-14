@@ -1,0 +1,40 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Book"
+msgstr ""
+
+msgid "This book is empty."
+msgstr ""
+
+msgid "By @1"
+msgstr ""
+
+msgid "Close"
+msgstr ""
+
+msgid "Allows the use of Dungeon Escape commands."
+msgstr ""
+
+msgid "Restores full health according to the game mode."
+msgstr ""
+
+msgid "Player not found."
+msgstr ""
+
+msgid "You cannot grant yourself privileges during the game."
+msgstr ""
+
+msgid "Game over."
+msgstr ""
+
+msgid "GAME OVER"
+msgstr ""
+
+msgid "You died."
+msgstr ""
+
+msgid "The game is over."
+msgstr ""

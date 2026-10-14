@@ -1,0 +1,3 @@
+stairs.glass_sides (Show glass stair side texture) bool true
+
+stairs.old_placement (Use old placement style) bool false

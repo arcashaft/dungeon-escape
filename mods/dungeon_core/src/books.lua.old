@@ -1,0 +1,172 @@
+-- =========================================================
+-- MODULO: dungeon_core / books
+-- Gestiona los libros en solo lectura.
+-- =========================================================
+
+-- =========================================================
+-- MOSTRAR LIBRO EN SOLO LECTURA
+-- =========================================================
+
+local S = minetest.get_translator("dungeon_core")
+
+
+local function readonly_book_on_use(
+    itemstack,
+    user
+)
+
+    if not user then
+        return itemstack
+    end
+
+
+    local player_name =
+        user:get_player_name()
+
+
+    local meta =
+        itemstack:get_meta()
+
+    local data =
+        meta:to_table()
+
+    local fields = {}
+
+
+    if data and data.fields then
+        fields = data.fields
+    end
+
+
+    local title =
+        fields.title or S("Book")
+
+    local owner =
+        fields.owner
+        or fields.author
+        or ""
+
+    local text =
+        fields.text
+        or ""
+
+
+    if text == "" then
+        text = S("This book is empty.")
+    end
+
+
+    title =
+        minetest.formspec_escape(
+            title
+        )
+
+    owner =
+        minetest.formspec_escape(
+            owner
+        )
+
+    text =
+        minetest.formspec_escape(
+            text
+        )
+
+
+    local formspec =
+        "formspec_version[4]"
+        .. "size[8,8]"
+
+        .. "label[0.5,0.35;"
+        .. title
+        .. "]"
+
+        .. "label[0.5,0.75;"
+        .. (
+            owner ~= ""
+            and (S("By @1", owner))
+            or ""
+        )
+        .. "]"
+
+        .. "textarea[0.5,1.2;7,5.8;;;"
+        .. text
+        .. "]"
+
+        .. "button_exit[3,7.25;2,0.8;close;"
+        .. S("Close")
+        .. "]"
+
+
+    minetest.show_formspec(
+        player_name,
+        "dungeon_core:readonly_book",
+        formspec
+    )
+
+
+    return itemstack
+
+end
+
+
+-- =========================================================
+-- CONTROL DEL FORMULARIO DEL LIBRO
+-- =========================================================
+
+minetest.register_on_player_receive_fields(
+    function(
+        player,
+        formname,
+        fields
+    )
+
+        if formname ==
+            "dungeon_core:readonly_book"
+        then
+
+            return true
+
+        end
+
+    end
+)
+
+
+-- =========================================================
+-- APLICAR RESTRICCIÓN A LOS LIBROS
+-- =========================================================
+
+minetest.register_on_mods_loaded(
+    function()
+
+        if minetest.registered_items[
+            "default:book"
+        ] then
+
+            minetest.override_item(
+                "default:book",
+                {
+                    on_use =
+                        readonly_book_on_use
+                }
+            )
+
+        end
+
+
+        if minetest.registered_items[
+            "default:book_written"
+        ] then
+
+            minetest.override_item(
+                "default:book_written",
+                {
+                    on_use =
+                        readonly_book_on_use
+                }
+            )
+
+        end
+
+    end
+)

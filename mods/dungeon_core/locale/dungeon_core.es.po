@@ -1,0 +1,31 @@
+msgid ""
+msgstr ""
+"Language: es\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+msgid "Close"
+msgstr "Cerrar"
+
+msgid "Allows the use of Dungeon Escape commands."
+msgstr "Permite utilizar los comandos de Dungeon Escape."
+
+msgid "Restores full health according to the game mode."
+msgstr "Restaura toda la vida según el modo de juego."
+
+msgid "Player not found."
+msgstr "Jugador no encontrado."
+
+msgid "You cannot grant yourself privileges during the game."
+msgstr "No puedes concederte privilegios durante la partida."
+
+msgid "Game over."
+msgstr "Partida finalizada."
+
+msgid "GAME OVER"
+msgstr "GAME OVER"
+
+msgid "You died."
+msgstr "Has muerto."
+
+msgid "The game is over."
+msgstr "La partida ha terminado."
