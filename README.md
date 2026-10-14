@@ -90,4 +90,4 @@ You can report them via the GitHub repository's issue tracker.
 
 ## Repository
 
-[GitHub](INSERT_URL_HERE)
+[GitHub](https://github.com/arcashaft/dungeon-escape.git)
