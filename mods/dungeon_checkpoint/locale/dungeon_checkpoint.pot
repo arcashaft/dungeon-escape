@@ -1,0 +1,25 @@
+msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "Player not found or invalid coordinates."
+msgstr ""
+
+msgid "The position could not be determined."
+msgstr ""
+
+msgid "Set the room's checkpoint."
+msgstr ""
+
+msgid "Checkpoint activated for "
+msgstr ""
+
+msgid " at "
+msgstr ""
+
+msgid "Set a forced spawn."
+msgstr ""
+
+msgid "Forced spawn set for "
+msgstr ""

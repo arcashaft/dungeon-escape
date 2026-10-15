@@ -13,6 +13,7 @@
 -- En Permadeath ambos comandos se ignoran.
 -- =========================================================
 
+local S = minetest.get_translator("dungeon_checkpoint")
 
 -- =========================================================
 -- MODO DE JUEGO
@@ -126,7 +127,7 @@ local function get_target_and_pos(name, param)
     if not player and not pos then
 
         return nil, nil,
-            "Jugador no encontrado o coordenadas inválidas."
+            S("Player not found or invalid coordinates.")
 
     end
 
@@ -146,7 +147,7 @@ local function get_target_and_pos(name, param)
     if not pos then
 
         return nil, nil,
-            "No se pudo determinar la posición."
+            S("The position could not be determined.")
 
     end
 
@@ -175,7 +176,7 @@ minetest.register_chatcommand(
         params = "[] [  ]",
 
         description =
-            "Establece el checkpoint de la sala.",
+            S("Set the room's checkpoint."),
 
         privs = {
             interact = true,
@@ -228,11 +229,11 @@ minetest.register_chatcommand(
 
 
             return true,
-                "Checkpoint activado para "
+                S("Checkpoint activated for ")
                 .. (player
                     and player:get_player_name()
                     or name)
-                .. " en "
+                .. S(" at ")
                 .. minetest.pos_to_string(pos)
 
         end
@@ -255,7 +256,7 @@ minetest.register_chatcommand(
         params = "[] [  ]",
 
         description =
-            "Establece un spawn forzado.",
+            S("Set a forced spawn."),
 
         privs = {
             interact = true,
@@ -318,11 +319,11 @@ minetest.register_chatcommand(
 
 
             return true,
-                "Spawn forzado establecido para "
+                S("Forced spawn set for ")
                 .. (player
                     and player:get_player_name()
                     or name)
-                .. " en "
+                .. S(" at ")
                 .. minetest.pos_to_string(pos)
 
         end
