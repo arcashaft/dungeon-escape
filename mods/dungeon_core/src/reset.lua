@@ -1,430 +1,199 @@
 -- =========================================================
--- MODULO: dungeon_core / reset
--- Gestiona el reinicio del Dungeon al morir.
+-- MÓDULO: dungeon_core / reset
+-- Al morir el jugador, restaura únicamente los dos cofres originales.
+-- El resto de la mazmorra permanece sin cambios.
 -- =========================================================
 
 local M = {}
-
 
 function M.setup(ctx)
 
     local reset_in_progress = false
 
+    -- Cofres originales almacenados en dungeon1.zip. 
+    -- metadata_file y metadata_key identifican la entrada de metadatos original exacta, lo que incluye el inventario original y los metadatos de los objetos.
+    local chests_to_restore = {
+        {
+            pos = {x = 109, y = 201, z = 134},
+            metadata_file = "mapblock_(12,25,23).meta.json",
+            metadata_key = "(13,9,6)",
+        },
+        {
+            pos = {x = 0, y = -76, z = -52},
+            metadata_file = "mapblock_(6,8,11).meta.json",
+            metadata_key = "(0,4,12)",
+        },
+        {
+            pos = {x = 145, y = 201, z = 101},
+            metadata_file = "mapblock_(15,25,21).meta.json",
+            metadata_key = "(1,9,5)",
+        },
+    }
 
-    -- =====================================================
-    -- RESTAURAR UN MAPBLOCK
-    -- =====================================================
-
-    local function reset_single_mapblock(
-        mapblock
-    )
-
-        -- =================================================
-        -- LÍMITES DEL MAPBLOCK
-        -- =================================================
-
-        local pos1, pos2 =
-            mapblock_lib.get_mapblock_bounds_from_mapblock(
-                mapblock
-            )
-
-
-        -- =================================================
-        -- 1. LIMPIAR METADATA ACTUAL
-        -- =================================================
-
-        local metadata_positions =
-            minetest.find_nodes_with_meta(
-                pos1,
-                pos2
-            )
-
-
-        for _, pos in ipairs(
-            metadata_positions
-        ) do
-
-            -- Detener timers que pudiera haber creado
-            -- la partida.
-
-            minetest.get_node_timer(
-                pos
-            ):stop()
-
-
-            -- Eliminar metadata actual.
-
-            minetest.get_meta(
-                pos
-            ):from_table(
-                nil
-            )
-
+    local function read_original_chest_metadata(chest)
+        if chest.original_metadata then
+            return chest.original_metadata
         end
 
-
-        -- =================================================
-        -- 2. VACIAR MAPBLOCK
-        -- =================================================
-
-        -- Esto elimina también las entidades no jugador,
-        -- entre ellas signs_lib:text.
-
-        mapblock_lib.clear_mapblock(
-            mapblock
-        )
-
-
-        -- =================================================
-        -- 3. COORDENADAS RELATIVAS DEL ZIP
-        -- =================================================
-
-        local relative_mapblock = {
-            x = mapblock.x
-                - ctx.dungeon_map_min.x,
-
-            y = mapblock.y
-                - ctx.dungeon_map_min.y,
-
-            z = mapblock.z
-                - ctx.dungeon_map_min.z
-        }
-
-
-        local relative_pos_string =
-            minetest.pos_to_string(
-                relative_mapblock
-            )
-
-
-        local bin_name =
-            "mapblock_"
-            .. relative_pos_string
-            .. ".bin"
-
-
-        local meta_name =
-            "mapblock_"
-            .. relative_pos_string
-            .. ".meta.json"
-
-
-        -- =================================================
-        -- 4. LEER MANIFEST
-        -- =================================================
-
-        local manifest_data =
-            ctx.dungeon_zip:get(
-                meta_name
-            )
-
-
-        -- Si no existe, el original era completamente aire.
-
-        if not manifest_data then
-            return true
-        end
-
-
-        -- =================================================
-        -- 5. LEER MAPBLOCK ORIGINAL
-        -- =================================================
-
-        local mapblock_data =
-            ctx.dungeon_zip:get(
-                bin_name
-            )
-
-
-        if not mapblock_data then
-
+        if not ctx.dungeon_zip then
             minetest.log(
                 "error",
-
-                "[dungeon_core] Cannot restore "
-                .. bin_name
+                "[dungeon_core] Cannot restore chest: dungeon ZIP is unavailable."
             )
-
-            return false
-
+            return nil
         end
 
-
-        local manifest =
-            minetest.parse_json(
-                manifest_data
-            )
-
-
-        if not manifest then
-
+        local raw_data = ctx.dungeon_zip:get(chest.metadata_file)
+        if not raw_data then
             minetest.log(
                 "error",
-
-                "[dungeon_core] Invalid manifest: "
-                .. meta_name
+                "[dungeon_core] Missing chest metadata file: "
+                .. chest.metadata_file
             )
-
-            return false
-
+            return nil
         end
 
+        local file_data = minetest.parse_json(raw_data)
+        local metadata_entry = file_data
+            and file_data.metadata
+            and file_data.metadata.meta
+            and file_data.metadata.meta[chest.metadata_key]
 
-        local original_mapblock =
-            mapblock_lib.read_mapblock(
-                mapblock_data
-            )
-
-
-        if not original_mapblock then
-
+        if not metadata_entry then
             minetest.log(
                 "error",
-
-                "[dungeon_core] Cannot read "
-                .. bin_name
+                "[dungeon_core] Original chest metadata not found at local position "
+                .. chest.metadata_key
+                .. " in "
+                .. chest.metadata_file
             )
-
-            return false
-
+            return nil
         end
 
-
-        -- =================================================
-        -- 6. RESTAURAR MAPBLOCK
-        -- =================================================
-
-        local ok, err =
-            mapblock_lib.deserialize_mapblock(
-                mapblock,
-                original_mapblock,
-                manifest,
-                {
-                    mode = "replace"
-                }
-            )
-
-
-        if not ok then
-
-            minetest.log(
-                "error",
-
-                "[dungeon_core] Error restoring "
-                .. minetest.pos_to_string(
-                    mapblock
-                )
-                .. ": "
-                .. tostring(err)
-            )
-
-            return false
-
-        end
-
-
-        return true
-
+        chest.original_metadata = metadata_entry
+        return metadata_entry
     end
 
+    local function restore_chest(chest, callback)
+        -- Asegúrate de que el bloque de mapa esté cargado antes de acceder al nodo.
+        minetest.emerge_area(
+            chest.pos,
+            chest.pos,
+            function(blockpos, action, calls_remaining)
+                if calls_remaining ~= 0 then
+                    return
+                end
 
-    -- =====================================================
-    -- RESET POR LOTES
-    -- =====================================================
+                local success = false
 
-    local function reset_mapblocks_batch(
-        mapblocks,
-        index
-    )
+                if action == minetest.EMERGE_CANCELLED
+                    or action == minetest.EMERGE_ERRORED
+                then
+                    minetest.log(
+                        "warning",
+                        "[dungeon_core] Could not load the mapblock for chest at "
+                        .. minetest.pos_to_string(chest.pos)
+                    )
+                else
+                    local node = minetest.get_node_or_nil(chest.pos)
 
-        -- =================================================
-        -- FIN DEL RESET DE MAPBLOCKS
-        -- =================================================
+                    if not node or node.name == "ignore" then
+                        minetest.log(
+                            "warning",
+                            "[dungeon_core] Chest position is not loaded: "
+                            .. minetest.pos_to_string(chest.pos)
+                        )
+                    elseif node.name ~= "default:chest" then
+                        minetest.log(
+                            "warning",
+                            "[dungeon_core] Expected default:chest at "
+                            .. minetest.pos_to_string(chest.pos)
+                            .. ", found "
+                            .. node.name
+                        )
+                    else
+                        local original_metadata =
+                            read_original_chest_metadata(chest)
 
-        if index > #mapblocks then
+                        if original_metadata then
+                            minetest.get_meta(chest.pos):from_table(
+                                original_metadata
+                            )
+                            success = true
 
-            reset_in_progress = false
+                            minetest.log(
+                                "action",
+                                "[dungeon_core] Restored chest at "
+                                .. minetest.pos_to_string(chest.pos)
+                            )
+                        end
+                    end
+                end
 
-
-            minetest.log(
-                "action",
-                "[dungeon_core] Mapblocks restored."
-            )
-
-
-            -- Regenerar los carteles después de terminar
-            -- TODO el reset.
-
-            minetest.after(
-                0.2,
-                ctx.restore_all_signs
-            )
-
-
-            return
-
-        end
-
-
-        -- =================================================
-        -- TAMAÑO DEL LOTE
-        -- =================================================
-
-        local batch_size = 25
-
-
-        local last_index =
-            math.min(
-                index + batch_size - 1,
-                #mapblocks
-            )
-
-
-        -- =================================================
-        -- PROCESAR LOTE
-        -- =================================================
-
-        for i = index,
-            last_index do
-
-            reset_single_mapblock(
-                mapblocks[i]
-            )
-
-        end
-
-
-        -- =================================================
-        -- SIGUIENTE LOTE
-        -- =================================================
-
-        minetest.after(
-            0,
-            reset_mapblocks_batch,
-            mapblocks,
-            last_index + 1
+                callback(success)
+            end
         )
-
     end
-
-
-    -- =====================================================
-    -- MUERTE DEL JUGADOR
-    -- =====================================================
 
     minetest.register_on_dieplayer(
         function(player, reason)
+            local player_name = player:get_player_name()
 
-            local player_name =
-                player:get_player_name()
-
-
-            -- =================================================
-            -- PERDER EL INVENTARIO AL MORIR
-            -- =================================================
-
-            local inventory =
-                player:get_inventory()
-
-            for listname, _ in pairs(
-                inventory:get_lists()
-            ) do
-
-                inventory:set_list(
-                    listname,
-                    {}
-                )
-
+            -- Mantener el comportamiento actual del juego: el inventario del jugador se vacía al morir.
+            local inventory = player:get_inventory()
+            for listname, _ in pairs(inventory:get_lists()) do
+                inventory:set_list(listname, {})
             end
-
 
             if reset_in_progress then
-
                 minetest.log(
                     "warning",
-
-                    "[dungeon_core] There is already a reset "
-                    .. "of the Dungeon in progress."
+                    "[dungeon_core] Chest reset is already in progress."
                 )
-
                 return
-
             end
-
 
             reset_in_progress = true
 
-
             minetest.log(
                 "action",
-
-                "[dungeon_core] "
-                .. player_name
-                .. " has died."
+                "[dungeon_core] " .. player_name .. " has died."
             )
-
-
-            -- =================================================
-            -- COPIAR LISTA DE MAPBLOCKS
-            -- =================================================
-
-            local mapblocks = {}
-
-
-            for _, mapblock in pairs(
-                ctx.generated_mapblocks
-            ) do
-
-                table.insert(
-                    mapblocks,
-                    {
-                        x = mapblock.x,
-                        y = mapblock.y,
-                        z = mapblock.z
-                    }
-                )
-
-            end
-
-
             minetest.log(
                 "action",
-
-                "[dungeon_core] Restoring "
-                .. #mapblocks
-                .. " mapblocks..."
+                "[dungeon_core] Restoring the designated chests; leaving the rest of the dungeon unchanged."
             )
 
+            local remaining = #chests_to_restore
+            local restored_count = 0
 
-            -- =================================================
-            -- NADA QUE RESTAURAR
-            -- =================================================
+            local function on_chest_finished(success)
+                if success then
+                    restored_count = restored_count + 1
+                end
 
-            if #mapblocks == 0 then
+                remaining = remaining - 1
 
-                reset_in_progress = false
-
-                return
-
+                if remaining <= 0 then
+                    reset_in_progress = false
+                    minetest.log(
+                        "action",
+                        "[dungeon_core] Chest reset complete: restored "
+                        .. restored_count
+                        .. " of "
+                        .. #chests_to_restore
+                        .. " chests."
+                    )
+                end
             end
 
-
-            -- =================================================
-            -- COMENZAR RESET
-            -- =================================================
-
-            reset_mapblocks_batch(
-                mapblocks,
-                1
-            )
-
+            for _, chest in ipairs(chests_to_restore) do
+                restore_chest(chest, on_chest_finished)
+            end
         end
     )
 
-
     return ctx
-
 end
-
 
 return M

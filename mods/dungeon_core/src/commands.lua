@@ -50,7 +50,7 @@ function commands.setup(ctx)
                 if dungeon_mode == "Hardcore"
                     or dungeon_mode == "Permadeath"
                 then
-                    max_hp = 6
+                    max_hp = 2
                 end
 
                 player:set_hp(max_hp)
