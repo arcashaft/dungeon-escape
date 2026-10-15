@@ -51,7 +51,9 @@ A single chance. If you die, the game ends.
 ## How to Play
 
 Dungeon Escape includes an introductory tutorial that explains the controls and basic game mechanics.
-Explore the rooms, observe your surroundings carefully, and look for clues to help you progress. Not everything is as it seems. ## Installation
+Explore the rooms, observe your surroundings carefully, and look for clues to help you progress. Not everything is as it seems.
+
+## Installation
 
 Dungeon Escape can be installed directly from ContentDB using the Luanti content browser.
 You can also download the game from its GitHub repository.
